@@ -6,13 +6,13 @@ pipeline {
     }
 
     environment {
-        GIT_BRANCH_NAME = "${env.BRANCH_NAME ?: 'unknown'}"
+        GIT_BRANCH_NAME = env.BRANCH_NAME ?: sh(returnStdout: true, script: "git rev-parse --abbrev-ref HEAD").trim()
     }
 
     stages {
         stage('Filter Branch') {
             when {
-                expression { env.BRANCH_NAME.startsWith('feature/') }
+                expression { env.BRANCH_NAME && env.BRANCH_NAME.startsWith('feature/') }
             }
             steps {
                 echo "Triggering pipeline for branch: ${env.BRANCH_NAME}"
@@ -20,20 +20,18 @@ pipeline {
         }
 
         stage('Checkout Code') {
-            when {
-                expression { env.BRANCH_NAME.startsWith('feature/') }
-            }
             steps {
-                git 'https://github.com/Bharathdev07/java-mavne.git'
+                checkout([
+                    $class: 'GitSCM',
+                    branches: [[name: '*/feature/*']],
+                    userRemoteConfigs: [[url: 'https://github.com/Bharathdev07/java-mavne.git']]
+                ])
             }
         }
 
         stage('Build') {
-            when {
-                expression { env.BRANCH_NAME.startsWith('feature/') }
-            }
             steps {
-                echo 'testing done'
+                echo 'Build stage executed'
             }
         }
     }
