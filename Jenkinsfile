@@ -15,5 +15,15 @@ stage('build') {
                 sh 'mvn clean install'
             }
         }
+        stage('done'){
+            steps {
+                echo 'pipeline done'
+            }
+        }
+           stage('done-1'){
+            steps {
+                echo 'pipeline done-1'
+            }
+        }
     }
 }
